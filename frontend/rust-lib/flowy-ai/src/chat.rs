@@ -251,19 +251,7 @@ impl Chat {
         },
         Err(err) => {
           error!("[Chat] failed to start streaming: {}", err);
-          if err.is_ai_response_limit_exceeded() {
-            let _ = answer_sink
-              .send(StreamMessage::AIResponseLimitExceeded.to_string())
-              .await;
-          } else if err.is_ai_image_response_limit_exceeded() {
-            let _ = answer_sink
-              .send(StreamMessage::AIImageResponseLimitExceeded.to_string())
-              .await;
-          } else if err.is_ai_max_required() {
-            let _ = answer_sink
-              .send(StreamMessage::AIMaxRequired(err.msg.clone()).to_string())
-              .await;
-          } else if err.is_local_ai_not_ready() {
+          if err.is_local_ai_not_ready() {
             let _ = answer_sink
               .send(StreamMessage::LocalAINotReady(err.msg.clone()).to_string())
               .await;

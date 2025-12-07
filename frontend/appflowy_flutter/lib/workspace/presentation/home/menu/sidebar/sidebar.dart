@@ -19,7 +19,6 @@ import 'package:appflowy/workspace/application/favorite/favorite_bloc.dart';
 import 'package:appflowy/workspace/application/favorite/prelude.dart';
 import 'package:appflowy/workspace/application/menu/sidebar_sections_bloc.dart';
 import 'package:appflowy/workspace/application/recent/cached_recent_service.dart';
-import 'package:appflowy/workspace/application/sidebar/billing/sidebar_plan_bloc.dart';
 import 'package:appflowy/workspace/application/sidebar/space/space_bloc.dart';
 import 'package:appflowy/workspace/application/tabs/tabs_bloc.dart';
 import 'package:appflowy/workspace/application/view/view_ext.dart';
@@ -75,69 +74,58 @@ class HomeSideBar extends StatelessWidget {
     //   |    +-- Workspace List: control to switch workspace
     //   |    |
     //   |    +-- Workspace Settings
-    //   |    |
+    //   |    | 
     //   |    +-- Notification Center
-    //   |
+    //   | 
     //   +-- Favorite Section
-    //   |
+    //   | 
     //   +-- Public Or Private Section: control the sections of the workspace
-    //   |
+    //   | 
     //   +-- Trash Section
-    return BlocProvider(
-      create: (context) => SidebarPlanBloc()
-        ..add(SidebarPlanEvent.init(workspaceSetting.workspaceId, userProfile)),
-      child: BlocConsumer<UserWorkspaceBloc, UserWorkspaceState>(
-        listenWhen: (prev, curr) =>
-            prev.currentWorkspace?.workspaceId !=
-            curr.currentWorkspace?.workspaceId,
-        listener: (context, state) {
-          if (FeatureFlag.search.isOn) {
-            // Notify command palette that workspace has changed
-            context.read<CommandPaletteBloc>().add(
-                  CommandPaletteEvent.workspaceChanged(
-                    workspaceId: state.currentWorkspace?.workspaceId,
-                  ),
-                );
-          }
+    return BlocConsumer<UserWorkspaceBloc, UserWorkspaceState>(
+      listenWhen: (prev, curr) =>
+          prev.currentWorkspace?.workspaceId !=
+          curr.currentWorkspace?.workspaceId,
+      listener: (context, state) {
+        if (FeatureFlag.search.isOn) {
+          // Notify command palette that workspace has changed
+          context.read<CommandPaletteBloc>().add(
+                CommandPaletteEvent.workspaceChanged(
+                  workspaceId: state.currentWorkspace?.workspaceId,
+                ),
+              );
+        }
 
-          if (state.currentWorkspace != null) {
-            context.read<SidebarPlanBloc>().add(
-                  SidebarPlanEvent.changedWorkspace(
-                    workspaceId: state.currentWorkspace!.workspaceId,
-                  ),
-                );
-          }
+        // Re-initialize workspace-specific services
+        getIt<CachedRecentService>().reset();
+      },
+      // Rebuild the whole sidebar when the current workspace changes
+      buildWhen: (previous, current) =>
+          previous.currentWorkspace?.workspaceId !=
+          current.currentWorkspace?.workspaceId,
+      builder: (context, state) {
+        if (state.currentWorkspace == null) {
+          return const SizedBox.shrink();
+        }
 
-          // Re-initialize workspace-specific services
-          getIt<CachedRecentService>().reset();
-        },
-        // Rebuild the whole sidebar when the current workspace changes
-        buildWhen: (previous, current) =>
-            previous.currentWorkspace?.workspaceId !=
-            current.currentWorkspace?.workspaceId,
-        builder: (context, state) {
-          if (state.currentWorkspace == null) {
-            return const SizedBox.shrink();
-          }
-
-          final workspaceId = state.currentWorkspace?.workspaceId ??
-              workspaceSetting.workspaceId;
-          return MultiBlocProvider(
-            providers: [
-              BlocProvider.value(value: getIt<ActionNavigationBloc>()),
-              BlocProvider(
-                create: (_) => SidebarSectionsBloc()
-                  ..add(SidebarSectionsEvent.initial(userProfile, workspaceId)),
-              ),
-              BlocProvider(
-                create: (_) => SpaceBloc(
-                  userProfile: userProfile,
-                  workspaceId: workspaceId,
-                )..add(const SpaceEvent.initial(openFirstPage: false)),
-              ),
-            ],
-            child: MultiBlocListener(
-              listeners: [
+        final workspaceId =
+            state.currentWorkspace?.workspaceId ?? workspaceSetting.workspaceId;
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: getIt<ActionNavigationBloc>()),
+            BlocProvider(
+              create: (_) => SidebarSectionsBloc()
+                ..add(SidebarSectionsEvent.initial(userProfile, workspaceId)),
+            ),
+            BlocProvider(
+              create: (_) => SpaceBloc(
+                userProfile: userProfile,
+                workspaceId: workspaceId,
+              )..add(const SpaceEvent.initial(openFirstPage: false)),
+            ),
+          ],
+          child: MultiBlocListener(
+            listeners: [
                 BlocListener<SidebarSectionsBloc, SidebarSectionsState>(
                   listenWhen: (p, c) =>
                       p.lastCreatedRootView?.id != c.lastCreatedRootView?.id,
