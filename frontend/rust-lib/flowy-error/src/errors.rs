@@ -87,24 +87,12 @@ impl FlowyError {
     )
   }
 
-  pub fn is_ai_response_limit_exceeded(&self) -> bool {
-    self.code == ErrorCode::AIResponseLimitExceeded
-  }
-
-  pub fn is_ai_image_response_limit_exceeded(&self) -> bool {
-    self.code == ErrorCode::AIImageResponseLimitExceeded
-  }
-
   pub fn is_local_ai_not_ready(&self) -> bool {
     self.code == ErrorCode::LocalAINotReady
   }
 
   pub fn is_local_ai_disabled(&self) -> bool {
     self.code == ErrorCode::LocalAIDisabled
-  }
-
-  pub fn is_ai_max_required(&self) -> bool {
-    self.code == ErrorCode::AIMaxRequired
   }
 
   static_flowy_error!(internal, ErrorCode::Internal);

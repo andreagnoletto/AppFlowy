@@ -189,13 +189,7 @@ impl CompletionTask {
 }
 
 async fn handle_error(sink: &mut IsolateSink, err: FlowyError) {
-  if err.is_ai_response_limit_exceeded() {
-    let _ = sink.send("ai_response_limit:".to_string()).await;
-  } else if err.is_ai_image_response_limit_exceeded() {
-    let _ = sink.send("ai_image_response_limit:".to_string()).await;
-  } else if err.is_ai_max_required() {
-    let _ = sink.send(format!("ai_max_required:{}", err.msg)).await;
-  } else if err.is_local_ai_not_ready() {
+  if err.is_local_ai_not_ready() {
     let _ = sink.send(format!("local_ai_not_ready:{}", err.msg)).await;
   } else if err.is_local_ai_disabled() {
     let _ = sink.send(format!("local_ai_disabled:{}", err.msg)).await;

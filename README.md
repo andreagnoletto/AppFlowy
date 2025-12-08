@@ -49,6 +49,7 @@ AppFlowy is the AI workspace where you achieve more without losing control of yo
     - [Play Store](https://play.google.com/store/apps/details?id=io.appflowy.appflowy): Android 10 or above; ARMv7 is
       not supported
 - [Self-hosting AppFlowy](https://appflowy.com/docs/self-host-appflowy-overview)
+- [Instalação com Docker Compose](doc/docker-compose-install.md)
 - [Source](https://docs.appflowy.io/docs/documentation/appflowy/from-source)
 
 ## Built With

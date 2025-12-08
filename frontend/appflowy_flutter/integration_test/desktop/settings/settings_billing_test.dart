@@ -12,7 +12,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Settings Billing', () {
-    testWidgets('Local auth cannot see plan+billing', (tester) async {
+    testWidgets('Local auth can see plan+billing', (tester) async {
       await tester.initializeAppFlowy();
       await tester.tapSignInAsGuest();
       await tester.expectToSeeHomePageWithGetStartedPage();
@@ -35,7 +35,7 @@ void main() {
           LocaleKeys.settings_planPage_menuLabel.tr(),
           skipOffstage: false,
         ),
-        findsNothing,
+        findsOneWidget,
       );
 
       expect(
@@ -43,7 +43,7 @@ void main() {
           LocaleKeys.settings_billingPage_menuLabel.tr(),
           skipOffstage: false,
         ),
-        findsNothing,
+        findsOneWidget,
       );
     });
   });
