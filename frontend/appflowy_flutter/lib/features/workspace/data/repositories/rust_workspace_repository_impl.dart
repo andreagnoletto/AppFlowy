@@ -82,6 +82,6 @@ class RustWorkspaceRepositoryImpl implements WorkspaceRepository {
 
   @override
   Future<bool> isBillingEnabled() async {
-    return billing_service.isBillingEnabled();
+    return true;
   }
 }
